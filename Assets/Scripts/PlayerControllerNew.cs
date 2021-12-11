@@ -17,25 +17,9 @@ public class PlayerControllerNew : NavAgentScript
     [SerializeField] GameObject navPointPrefab;
     private GameObject navPoint;
 
-    //camera variables
-    [SerializeField] Camera mainCamera;
-    [SerializeField] GameObject focalPoint;
-
-    Vector3 cameraOffset;
-
-    private float cameraZoomSpeed = 250;
-    private float cameraMinDistance = 10;
-    private float cameraMaxDistance = 35;
-
-    private float cameraOrbitSpeedX = 150;
-    private float minCameraAngleY = 30f;
-    private float maxCameraAngleY = 75f;
-
-
     // Start is called before the first frame update
     void Start()
     {
-
         navAgent = GetComponent<NavMeshAgent>();
 
         navAgent.speed = playerSpeed;
@@ -44,7 +28,6 @@ public class PlayerControllerNew : NavAgentScript
 
         navPoint = Instantiate(navPointPrefab, navPointPrefab.transform.position, navPointPrefab.transform.rotation);
 
-        UpdateCameraOffset();
     }
 
     // Update is called once per frame
@@ -54,93 +37,8 @@ public class PlayerControllerNew : NavAgentScript
         {
             HandlePrimaryMouseClick();
         }
-
     }
 
-
-    private void LateUpdate()
-    {
-        ZoomCamera();
-        //OrbitCamera();
-        mainCamera.transform.position = focalPoint.transform.position + cameraOffset;
-    }
-
-    private void UpdateCameraOffset()
-    {
-        cameraOffset = mainCamera.transform.position - focalPoint.transform.position;
-    }
-
-    private void ZoomCamera()
-    {
-        if (Input.mouseScrollDelta.y != 0)
-        {
-            float distanceFromPlayer = cameraOffset.magnitude;
-
-            if (cameraOffset.magnitude > cameraMinDistance && Input.mouseScrollDelta.y > 0 || cameraOffset.magnitude < cameraMaxDistance && Input.mouseScrollDelta.y < 0)
-            {
-                cameraOffset += mainCamera.transform.forward * Time.deltaTime * cameraZoomSpeed * Input.mouseScrollDelta.y;
-            }
-
-        }
-    }
-
-    //private void OrbitCamera()
-    //{
-    //    if (Input.GetMouseButton(1))
-    //    {
-    //        //    mainCamera.transform.LookAt(transform.position, Vector3.up);
-
-    //        //    float currentAngle = GetCameraAngle();
-
-    //        //    Debug.Log("CurrentAngle " + currentAngle);
-
-    //        //    if (currentAngle < maxCameraAngleY && Input.GetAxis("Mouse Y") < 0f || currentAngle > minCameraAngleY && Input.GetAxis("Mouse Y") > 0f)
-    //        //    {
-    //        //        mainCamera.transform.RotateAround(transform.position, transform.forward, Input.GetAxis("Mouse Y") * Time.deltaTime * cameraOrbitSpeedX);
-    //        //    }
-
-    //        //    mainCamera.transform.RotateAround(transform.position, transform.up, Input.GetAxis("Mouse X") * Time.deltaTime * cameraOrbitSpeedX);
-    //        //    UpdateCameraOffset();
-
-    //        Quaternion rotateAngle = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * Time.deltaTime * cameraOrbitSpeedX, Vector3.up);
-
-    //        cameraOffset = rotateAngle * cameraOffset;
-    //    }
-
-    //    mainCamera.transform.LookAt(focalPoint.transform.position);
-    //}
-
-    //private void OrbitCamera()
-    //{
-    //    if (Input.GetMouseButton(1))
-    //    {
-    //        Quaternion rotateAngle = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * Time.deltaTime * cameraOrbitSpeedX, Vector3.up);
-
-    //        cameraOffset = rotateAngle * cameraOffset;
-    //    }
-    //    mainCamera.transform.LookAt(focalPoint.transform.position);
-    //}
-
-    private void orbitCamera()
-    {
-        if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
-        {
-        }
-    }
-
-    private float GetCameraAngle()
-    {
-        Vector3 vectorToCamera = mainCamera.transform.position - focalPoint.transform.position;
-        // Convert to 2d I.e. product of X and Z vs Y 
-
-        float XZproduct = Mathf.Sqrt((vectorToCamera.x * vectorToCamera.x) + (vectorToCamera.z * vectorToCamera.z));
-
-        ////TEST CODE, proves XZproduction calculation is correct
-        //float XZproduct2 = Vector2.Distance(new Vector2(mainCamera.transform.position.x, mainCamera.transform.position.z), new Vector2(transform.position.x, transform.position.z));
-        //Debug.Log("XY: " + XZproduct + ", XZ2: " + XZproduct2);
-
-        return 90 - Mathf.Rad2Deg * Mathf.Atan(XZproduct / vectorToCamera.y);
-    }
 
     private void HandlePrimaryMouseClick()
     {
