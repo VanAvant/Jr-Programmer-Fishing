@@ -63,11 +63,11 @@ public class NPCFish : NavAgentScript
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Called onTriggerEnter" + other.name);
+        //Debug.Log("Called onTriggerEnter" + other.name);
         //if (other.gameObject.CompareTag("NavPoint") && other.transform.parent.name == this.name)
         if (other.gameObject.CompareTag("NavPoint"))
         {
-            Debug.Log("Touched navPoint");
+            //Debug.Log("Touched navPoint");
             //MoveToTarget(GetRandomPosition(), navPoint);
             movingToTarget = false;
         }

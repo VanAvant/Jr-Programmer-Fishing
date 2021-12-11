@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] GameManager gameManager;
+
     [SerializeField] GameObject focalPoint;
     private Vector3 cameraOffset;
     // Start is called before the first frame update
@@ -19,16 +21,21 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         CentreCameraOnPlayer();
-        //transform.LookAt(focalPoint.transform.position);
         UpdateCameraOffset();
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        ZoomCamera();
-        OrbitCamera();
-        transform.position = focalPoint.transform.position + cameraOffset;
+        if (gameManager.gameIsRunning)
+        {
+            if (Input.mouseScrollDelta.y != 0)
+            {
+                ZoomCamera();
+                OrbitCamera();
+            }
+            transform.position = focalPoint.transform.position + cameraOffset;
+        }
     }
 
     private void UpdateCameraOffset()
@@ -36,18 +43,34 @@ public class CameraController : MonoBehaviour
         cameraOffset = transform.position - focalPoint.transform.position;
     }
 
-    private void ZoomCamera()
+    public virtual void ZoomCamera()
     {
-        if (Input.mouseScrollDelta.y != 0)
-        {
-            float distanceFromPlayer = cameraOffset.magnitude;
+        //if (cameraOffset.magnitude > cameraMinDistance && Input.mouseScrollDelta.y > 0 || cameraOffset.magnitude < cameraMaxDistance && Input.mouseScrollDelta.y < 0)
+        //{
+        //    cameraOffset += transform.forward * Time.deltaTime * cameraZoomSpeed * Input.mouseScrollDelta.y;
+        //}
 
-            if (cameraOffset.magnitude > cameraMinDistance && Input.mouseScrollDelta.y > 0 || cameraOffset.magnitude < cameraMaxDistance && Input.mouseScrollDelta.y < 0)
+        cameraOffset += transform.forward * Time.deltaTime * cameraZoomSpeed * Input.mouseScrollDelta.y;
+
+        if (cameraOffset.magnitude > cameraMaxDistance)
+        {
+            cameraOffset = cameraOffset.normalized * cameraMaxDistance;
+        }
+        else
+        {
+            if (cameraOffset.magnitude < cameraMinDistance)
             {
-                cameraOffset += transform.forward * Time.deltaTime * cameraZoomSpeed * Input.mouseScrollDelta.y;
+                cameraOffset = cameraOffset.normalized * cameraMinDistance;
             }
         }
     }
+
+    public virtual void ZoomCamera(float multiplier)
+    {
+        cameraOffset = cameraOffset.normalized * multiplier;
+        ZoomCamera(); //Calling zoomCamera here effectively sets the camera to max zoom
+    }
+
 
     private void OrbitCamera()
     {

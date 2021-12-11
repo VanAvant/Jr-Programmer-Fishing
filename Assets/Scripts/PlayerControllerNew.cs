@@ -4,6 +4,8 @@ using UnityEngine.AI;
 
 public class PlayerControllerNew : NavAgentScript
 {
+    [SerializeField] GameManager gameManager;
+
     //Movement & animation variables
     [SerializeField] MeshCollider islandCollider;
     private float playerSpeed = 8;
@@ -28,26 +30,35 @@ public class PlayerControllerNew : NavAgentScript
 
         navPoint = Instantiate(navPointPrefab, navPointPrefab.transform.position, navPointPrefab.transform.rotation);
 
+        playerAnim.Play("Villager@Fishing02");
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+        if (gameManager.gameIsRunning)
         {
-            HandlePrimaryMouseClick();
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+            {
+                HandlePrimaryMouseClick();
+            }
         }
     }
-
 
     private void HandlePrimaryMouseClick()
     {
         Ray cursorRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(cursorRay, out hit)) // if ray hits a collider (should always be true)
+        if (Input.GetMouseButtonDown(0))
         {
             playerAnim.SetBool("b_IsPlayerMoving", true);
+        }
+
+        if (Physics.Raycast(cursorRay, out hit)) // if ray hits a collider (should always be true)
+        {
+            
 
             if (hit.collider.gameObject.name == "Island") //If it hits the island, move to point
             {
@@ -91,6 +102,7 @@ public class PlayerControllerNew : NavAgentScript
                             if (Input.GetMouseButtonDown(0))
                             {
                                 StartCoroutine(FishingRoutine(hit.point));
+                                
                             }
                         }
                     }
@@ -114,6 +126,7 @@ public class PlayerControllerNew : NavAgentScript
         transform.LookAt(lookAtPoint);
 
         playerAnim.Play("Villager@Fishing01");
+        playerAnim.SetBool("b_IsPlayerMoving", false);
 
         //Test code for logic purposes below this point
 
@@ -136,14 +149,19 @@ public class PlayerControllerNew : NavAgentScript
 
     private void OnTriggerEnter(Collider other) //detect nav points (for animation)
     {
+        Debug.Log("Touch navpoint");
         if (other.gameObject.CompareTag("NavPoint"))
         {
             if (other.GetComponent<NavPoint>().CastOnContact)
             {
                 StartCoroutine(FishingRoutine(other.transform.position));
             }
+
             other.GetComponent<NavPoint>().CastOnContact = false;
+
             playerAnim.SetBool("b_IsPlayerMoving", false);
+
+            navAgent.ResetPath();
         }
     }
 
