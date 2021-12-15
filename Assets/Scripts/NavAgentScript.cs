@@ -14,9 +14,11 @@ public class NavAgentScript : MonoBehaviour
 
     public void MoveToTarget(Vector3 target, GameObject navPoint) //Uses NavMesh to move player to passed point
     {
+        navPoint.transform.position = target;
+
         navAgent.ResetPath();
         navAgent.SetDestination(GetRaycastAtPosition(target).point);
-        navPoint.transform.position = target;
+        
     }
     public RaycastHit GetRaycastAtPosition(Vector3 point)
     {
@@ -27,6 +29,4 @@ public class NavAgentScript : MonoBehaviour
 
         return raycastHit;
     }//Returns the position of the top of the island geometry at a passed point 
-
-
 }

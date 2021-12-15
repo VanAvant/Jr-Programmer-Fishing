@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 6143061071894119123}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 6.6881695, z: 43.91}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 7539857852188328161}
   - {fileID: 2990865624538540386}
@@ -101,12 +101,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   navAgent: {fileID: 0}
+  gameManager: {fileID: 0}
   islandCollider: {fileID: 0}
-  minDistanceFromCast: 20
+  minCastDistanceFromTarget: 2
+  maxCastDistanceFromTarget: 12
   playerAnim: {fileID: 4486385743351896731}
   navPointPrefab: {fileID: 2038739252045520330, guid: 5f041ee51f6984146b56cff9df805c10, type: 3}
-  mainCamera: {fileID: 0}
-  focalPoint: {fileID: 7199325509800450651}
+  floatPrefab: {fileID: 8383179230003730756, guid: 71c92c7e0d99547409997694f8e6429d, type: 3}
 --- !u!1001 &6143061070457079033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,11 +173,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d3f87f114f86a3b4f88996e8d2e99fd8, type: 3}
---- !u!1 &7199325509800450651 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3938869664887627426, guid: d3f87f114f86a3b4f88996e8d2e99fd8, type: 3}
-  m_PrefabInstance: {fileID: 6143061070457079033}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7539857852188328161 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4459264826425738264, guid: d3f87f114f86a3b4f88996e8d2e99fd8, type: 3}
