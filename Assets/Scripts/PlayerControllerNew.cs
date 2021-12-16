@@ -7,7 +7,7 @@ public class PlayerControllerNew : NavAgentScript
     [SerializeField] GameManager gameManager;
 
     //Movement & animation variables
-    [SerializeField] MeshCollider islandCollider;
+    //[SerializeField] MeshCollider islandCollider;
     private float playerSpeed = 8;
     private float playerAcceleration = 120;
     private float playerAngularSpeed = 360;
@@ -16,18 +16,16 @@ public class PlayerControllerNew : NavAgentScript
     private float maxCastDistanceFromTarget = 25.0f;
     [SerializeField] Animator playerAnim;
 
-    private float mouseClickDuration = .1f;
-    private float mouseDragDelta = 0.0f;
-
     //NavMesh variables
     [SerializeField] GameObject navPointPrefab;
     private GameObject navPoint;
-    private int navPointLayer = 6;
+    //private int navPointLayer = 6;
+    private float samplePositionDistance = 50f;
 
     private string islandName = "Island";
     private int islandMeshArea = 1;
     private string seaName = "SeaQuad";
-    private int seaMeshArea = 3;
+    //private int seaMeshArea = 3;
 
     //Fishing variables 
     [SerializeField] GameObject floatPrefab;
@@ -56,9 +54,8 @@ public class PlayerControllerNew : NavAgentScript
         {
             if (Input.GetMouseButton(0))
             {
-                HandlePrimaryClick1();
+                HandlePrimaryClick();
             }
-            UpdateMouseDelta();
         }
     }
 
@@ -73,13 +70,11 @@ public class PlayerControllerNew : NavAgentScript
 
     }
 
-    private void MouseDragMove(RaycastHit cursorRaycast)
+    private void MovePlayerToTarget(RaycastHit cursorRaycast)
     {
-        //RaycastHit cursorRaycast = GetClickTarget();
-
         NavMeshHit discard;
 
-        if (NavMesh.SamplePosition(cursorRaycast.point, out discard, 30f, islandMeshArea)) //Contained within if statement because navmesh is rough in places due to premade island asset and causes unpredicatable behaviour otherwise
+        if (NavMesh.SamplePosition(cursorRaycast.point, out discard, samplePositionDistance, islandMeshArea)) //Contained within if statement because navmesh is rough in places due to premade island asset and causes unpredicatable behaviour otherwise
         {
             MoveToTarget(discard.position, navPoint);
 
@@ -90,35 +85,13 @@ public class PlayerControllerNew : NavAgentScript
         }
     }
 
-    private void UpdateMouseDelta()
-    {
-        if (Input.GetMouseButton(0))
-        {
-            mouseDragDelta += Time.deltaTime;
-        }
-
-        if (Input.GetMouseButtonUp(0)) 
-        {
-            //if (mouseDragDelta >= mouseClickDuration) //For debugging logic only
-            //{
-            //    Debug.Log("Was drag");
-            //}
-            //else
-            //{
-            //    Debug.Log("Was click");
-            //}
-            mouseDragDelta = 0;
-        }
-    }
-
-    private void HandlePrimaryClick1()
-    {
-        
+    private void HandlePrimaryClick()
+    {     
         RaycastHit cursorRaycast = GetClickTarget();
 
         if (cursorRaycast.collider.name == islandName) //If the user clicks or drags on the island, we don't care about other factors so it can be shortcut
         {         
-            MouseDragMove(cursorRaycast);
+            MovePlayerToTarget(cursorRaycast);
         }
         else
         {
@@ -154,18 +127,22 @@ public class PlayerControllerNew : NavAgentScript
 
             if (hit.collider.name == islandName)
             {
-                MoveToTarget(hit.point, navPoint);
+                MovePlayerToTarget(hit);
             }
             else
             {
                 NavMeshHit navmeshHit;
 
-                NavMesh.SamplePosition(cursorRaycast.point, out navmeshHit, 50f, islandMeshArea);
+                NavMesh.SamplePosition(cursorRaycast.point, out navmeshHit, 50f, islandMeshArea); //Get closest edge to clicked point & move there
 
-                MoveToTarget(navmeshHit.position, navPoint);
+                RaycastHit newRaycastHit;
+
+                Physics.Raycast(navmeshHit.position + Vector3.up, Vector3.down, out newRaycastHit); //Create new raycast at predetermined point, so the regular movement function can be used 
+
+                MovePlayerToTarget(newRaycastHit); //Opportunity to set up overrides in MovePlayerToTarget to accept both points and RaycastHits
             }
 
-            navPoint.GetComponent<NavPoint>().CastOnContact = true;
+            navPoint.GetComponent<NavPoint>().CastOnContact = true; //We always want to cast after clicking on the sea
 
             //Determine casting target
 
@@ -182,146 +159,32 @@ public class PlayerControllerNew : NavAgentScript
             {
                 //Calculate new fishing point;
                 Debug.Log("Need to get new fishing target");
+
+                Vector3 newFishingTarget = navAgent.destination + (moveTargetToFishingTarget.normalized * maxCastDistanceFromTarget); //Get point max distance from move target along vector from move target to clicked point
+                fishingTarget = newFishingTarget;
             }
         }
-        //else if (distanceToCast < minCastDistanceFromTarget)
+
         else if (distanceToCast < minCastDistanceFromTarget)
         {
             Debug.Log("Too close, cast over point");
 
             Vector3 newTarget = transform.position + (playerToTarget.normalized * minCastDistanceFromTarget);
 
-            StartCoroutine(FishingRoutine(newTarget));
+            fishingTarget = newTarget;
+            StartCoroutine(FishingRoutine(fishingTarget));
         }
         else
         {
             Debug.Log("In range, casting");
-            StartCoroutine(FishingRoutine(cursorRaycast.point));
+            fishingTarget = cursorRaycast.point;
+            StartCoroutine(FishingRoutine(fishingTarget));
         }
-
     }
-
-    //private void HandlePrimaryClick()
-    //{
-    //    playerAnim.SetBool("b_IsPlayerMoving", true);
-
-    //    RaycastHit cursorRaycast = GetClickTarget();
-
-    //    if (cursorRaycast.collider.name == islandName) //If player clicks on island - 
-    //    {
-    //        Debug.Log("Clicked island, moving to point");
-    //        NavMeshHit discard;
-
-    //        if (NavMesh.SamplePosition(cursorRaycast.point, out discard, 0.5f, islandMeshArea)) //if player click on (or very near) navmesh, move there. Contained within if statement because navmesh is rough in places and causes unpredicatable behaviour otherwise
-    //        {
-    //            MoveToTarget(cursorRaycast.point, navPoint);
-    //        }
-    //    }
-    //    else
-    //    {
-    //        if (cursorRaycast.collider.name == seaName) //Else, if the player clicks on or drags over the sea; 
-    //        {
-    //            if (Input.GetMouseButton(0) && !Input.GetMouseButtonDown(0)) //If the player is holding the mouse button down but has not clicked this frame I.E. they have dragged over the sea;
-    //            {
-    //                NavMeshHit closestPoint;
-
-    //                NavMesh.FindClosestEdge(cursorRaycast.point, out closestPoint, 1);
-    //                MoveToTarget(closestPoint.position, navPoint);
-    //            }
-
-    //            else //Else, player has clicked this frame i.e. wants to fish
-    //            {
-    //                Debug.Log("Clicked sea");
-    //                //If player is closer to the clicked point that minimum cast, cast minimum in that direction.
-    //                if (GetDistanceToAxis(cursorRaycast.point) < minCastDistanceFromTarget)
-    //                {
-    //                    Debug.Log("Closer to point than minimum distance");
-
-    //                    Vector3 newTargetOffset = (cursorRaycast.point - transform.position).normalized * minCastDistanceFromTarget;
-
-    //                    Vector3 newTarget = transform.position + newTargetOffset;
-
-    //                    newTarget.y = cursorRaycast.point.y; //Set target Y to sea height
-
-    //                    StartCoroutine(FishingRoutine(newTarget));
-    //                }
-
-    //                else
-    //                {
-    //                    if (GetDistanceToAxis(cursorRaycast.point) > maxCastDistanceFromTarget)
-    //                    {
-    //                        Debug.Log("Too far to cast, moving");
-    //                        ////Calculate point maxdistance from target along vector between player and target
-
-    //                        //Vector3 pointMaxDistanceFromTarget = (cursorRaycast.point - transform.position).normalized * maxCastDistanceFromTarget; //Vector is backwards 
-    //                        Vector3 pointMaxDistanceFromTarget = (transform.position - cursorRaycast.point).normalized * maxCastDistanceFromTarget;
-
-    //                        //Check if that point is on island
-
-    //                        Ray ray = new Ray(pointMaxDistanceFromTarget, Vector3.down);
-    //                        RaycastHit raycastHit;
-
-    //                        Physics.Raycast(ray, out raycastHit);
-    //                        //Debug.Log("RaycastHit: " + raycastHit.collider.name);
-
-    //                        if (raycastHit.collider.name == islandName)
-    //                        {
-    //                            Debug.Log("In range of island");
-    //                            NavMeshHit discard;
-
-    //                            if (NavMesh.SamplePosition(raycastHit.point, out discard, 0.5f, islandMeshArea)) //Move to point if it is on navmesh
-    //                            {
-    //                                Debug.Log("Moving to point on navMesh");
-    //                                MoveToTarget(raycastHit.point, navPoint);
-    //                            }
-
-    //                            else
-    //                            {
-    //                                Debug.Log("Moving to closest edge");
-    //                                NavMesh.FindClosestEdge(raycastHit.point, out discard, islandMeshArea); //Else move to closest edge 
-    //                                MoveToTarget(discard.position, navPoint);
-    //                            }
-
-    //                            //Start fishing when player reaches target
-    //                            navPoint.GetComponent<NavPoint>().CastOnContact = true;
-    //                            fishingTarget = cursorRaycast.point;
-    //                        }
-
-    //                        else //If clicked point is further than maxCastDistance from island, cast as far as possible from closest edge;
-    //                        {
-    //                            Debug.Log("Too far, moving to cast as close as possible");
-    //                            NavMeshHit discard;
-
-    //                            NavMesh.FindClosestEdge(raycastHit.point, out discard, islandMeshArea); //Else move to closest edge 
-    //                            MoveToTarget(discard.position, navPoint);
-    //                            navPoint.GetComponent<NavPoint>().CastOnContact = true;
-
-    //                            //Calculate point max distance from target along vector between original target and player;
-    //                            Vector3 betweenTargetAndCastPoint = cursorRaycast.point - discard.position;
-
-    //                            fishingTarget = discard.position + (betweenTargetAndCastPoint.normalized * maxCastDistanceFromTarget);
-    //                        }
-    //                    }
-    //                    else //Player is in range, can go straight to fishing
-    //                    {
-    //                        Debug.Log("In range, starting fishing");
-    //                        StartCoroutine(FishingRoutine(cursorRaycast.point));
-    //                    }
-    //                }
-
-    //            }
-    //        }
-    //    }
-    //}
-
-    private float GetDistanceToAxis(Vector3 target)
-    {
-        return (new Vector2(target.x, target.z) - new Vector2(transform.position.x, transform.position.z)).magnitude;
-    }//Returns distance from player to passed point's y-axis
 
     IEnumerator FishingRoutine(Vector3 target)
     {
-        Instantiate(floatPrefab, target, transform.rotation); //For debugging only
+        //GameObject fishingFloat = Instantiate(floatPrefab, target, transform.rotation); //For debugging only
 
         navAgent.ResetPath();
         Debug.Log("Casting");
@@ -341,13 +204,12 @@ public class PlayerControllerNew : NavAgentScript
 
         //Debug.Log("Launch angle: " + GetLaunchAngle(target));
 
-        //floatObj.transform.LookAt()
-
         while (!cancelFishing)
         {
             if (Input.GetMouseButtonDown(0))
             {
                 cancelFishing = true;
+                //GameObject.Destroy(fishingFloat);
             }
             yield return null;
         }

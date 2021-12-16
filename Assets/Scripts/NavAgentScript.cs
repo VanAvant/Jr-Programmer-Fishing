@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class NavAgentScript : MonoBehaviour
 {
-    public NavMeshAgent navAgent;
+    protected NavMeshAgent navAgent;
 
     //private void Start()
     //{

@@ -5,11 +5,10 @@ using UnityEngine.AI;
 
 public class NPCFish : NavAgentScript
 {
-    [SerializeField] GameObject testTracker; //Remove once moving/choosing spawn points is working
 
     //NPC Spawning variables
-    [SerializeField] float spawnMinRadius;
-    [SerializeField] float spawnMaxRadius;
+    private float spawnMinRadius;
+    private float spawnMaxRadius;
 
     //NPC movement/behaviour variables
     [SerializeField] GameObject navPointPrefab;
@@ -23,13 +22,14 @@ public class NPCFish : NavAgentScript
 
     private bool isIdle = true;
 
-    // Start is called before the first frame update
     void Awake()
     {
         swimSpeed = 8.0f; // Place into child once tested
         navAgent = GetComponent<NavMeshAgent>();
         navPoint = Instantiate(navPointPrefab, GetRandomPosition(), navPointPrefab.transform.rotation);
 
+        spawnMaxRadius = 120;
+        spawnMinRadius = 60;
     }
 
     // Update is called once per frame
@@ -43,12 +43,7 @@ public class NPCFish : NavAgentScript
                 movingToTarget = true;
             }
         }
-
-        //nextTarget = GetRandomPosition();
-        //Instantiate(testTracker, nextTarget, testTracker.transform.rotation);
     }
-
-    
 
     public Vector3 GetRandomPosition()
     {
