@@ -14,7 +14,7 @@ public class NPCFish : NavAgentScript
     [SerializeField] GameObject navPointPrefab;
     private GameObject navPoint;
 
-    [SerializeField] float targetMaxRadius;
+    //[SerializeField] float targetMaxRadius;
 
     private Vector3 nextTarget;
     private bool movingToTarget;
@@ -28,20 +28,19 @@ public class NPCFish : NavAgentScript
         navAgent = GetComponent<NavMeshAgent>();
         navPoint = Instantiate(navPointPrefab, GetRandomPosition(), navPointPrefab.transform.rotation);
 
-        spawnMaxRadius = 120;
-        spawnMinRadius = 60;
+        spawnMaxRadius = 75;
+        spawnMinRadius = 65;
+
+        transform.position = GetRandomPosition();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isIdle)
+        if (!movingToTarget)
         {
-            if (!movingToTarget)
-            {
-                MoveToTarget(GetRandomPosition(), navPoint);
-                movingToTarget = true;
-            }
+            MoveToTarget(GetRandomPosition(), navPoint);
+            movingToTarget = true;
         }
     }
 
@@ -49,10 +48,11 @@ public class NPCFish : NavAgentScript
     {
         Vector2 randomDirection = Random.insideUnitCircle.normalized;
 
-        randomDirection *= Random.Range(spawnMinRadius, targetMaxRadius);
+        randomDirection *= Random.Range(spawnMinRadius, spawnMaxRadius);
 
         Vector3 newPosition = new Vector3(randomDirection.x, transform.position.y, randomDirection.y);
 
+        //Debug.Log("NewRandomPosition: " + newPosition);
         return newPosition;
     }
 
@@ -65,6 +65,7 @@ public class NPCFish : NavAgentScript
             //Debug.Log("Touched navPoint");
             //MoveToTarget(GetRandomPosition(), navPoint);
             movingToTarget = false;
+            Debug.Log(gameObject.name + "Touched navpoint");
         }
     }
 }

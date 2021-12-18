@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         //mainCamera.transform.SetPositionAndRotation(titleCamera.transform.position, titleCamera.transform.rotation);
+        fishList = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -50,30 +51,34 @@ public class GameManager : MonoBehaviour
             //If spawn position is on camera, mirror X and Z 
 
             int nextFishType = Random.Range(0, fishPrefabList.Count);
-            Debug.Log("Next fish type: " + nextFishType);
 
-            Vector3 spawnPosition = fishPrefabList[nextFishType].GetComponent<NPCFish>().GetRandomPosition(); //Something is wrong here, always returns exactly the same values
-            Debug.Log("Random position: " + spawnPosition);
+            //Debug.Log("Next fish type: " + nextFishType);
 
+            GameObject newFish = Instantiate(fishPrefabList[nextFishType], fishPrefabList[nextFishType].transform.position, fishPrefabList[nextFishType].transform.rotation); //Rotation doesn't matter as it is controlled by navmeshagent;
 
-            if (IsPointOnScreen(spawnPosition))
+            if (IsPointOnScreen(newFish.transform.position))
             {
-                Debug.Log("Mirrored position");
-                spawnPosition.x = -spawnPosition.x;
-                spawnPosition.y = -spawnPosition.y;
+                //Debug.Log("Mirroring position " + newFish.transform);
+
+                Vector3 newPos = newFish.transform.position;
+
+                newPos.x = -newPos.x;
+                newPos.y = -newPos.y;
+
+                newFish.transform.position = newPos;
+
+                //Debug.Log("New position " + newFish.transform);
             }
 
-            GameObject newFish = Instantiate(fishPrefabList[nextFishType], spawnPosition, transform.rotation); //Rotation doesn't matter as it is controlled by navmeshagent;
-
-            //fishList.Add(newFish);
+            fishList.Add(newFish);
         }
     }
 
-    private bool IsPointOnScreen(Vector3 point)
+    private bool IsPointOnScreen(Vector3 point) //Not sure if this is working
     {
         Vector3 pointOnScreen = mainCamera.WorldToViewportPoint(point);
 
-        Debug.Log("Point on screen: " + pointOnScreen);
+        //Debug.Log("Point on screen: " + pointOnScreen);
 
         if (pointOnScreen.z > 0)
         {
