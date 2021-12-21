@@ -9,13 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3426395651947660115}
-  - component: {fileID: 3426395651947660076}
   - component: {fileID: 3426395651947660077}
   - component: {fileID: 410540610}
   - component: {fileID: 410540611}
+  - component: {fileID: 8110132862261568459}
+  - component: {fileID: 735385176}
   m_Layer: 0
   m_Name: Shark
-  m_TagString: Untagged
+  m_TagString: Shark
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,31 +29,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3426395651947660114}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 39, y: 0, z: -61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8573707640800179040}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3426395651947660076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3426395651947660114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75b472f0473088644b7624857b0150ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  navAgent: {fileID: 0}
-  testTracker: {fileID: 348308148646320397, guid: 8d6c173a9c6a44942a078cb42da489e6, type: 3}
-  spawnMinRadius: 60
-  spawnMaxRadius: 120
-  navPointPrefab: {fileID: 2038739252045520330, guid: 5f041ee51f6984146b56cff9df805c10, type: 3}
-  targetMaxRadius: 90
 --- !u!195 &3426395651947660077
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -63,7 +46,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 15
+  m_Speed: 10
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -104,7 +87,34 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 2.269537
   m_Direction: 1
-  m_Center: {x: 0, y: 0.6347685, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!136 &8110132862261568459
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3426395651947660114}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 9.038755
+  m_Height: 26.273058
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &735385176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3426395651947660114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7afe61a3401a045409725f8617ff67c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navPointPrefab: {fileID: 2038739252045520330, guid: 5f041ee51f6984146b56cff9df805c10, type: 3}
 --- !u!1001 &3426395652641576115
 PrefabInstance:
   m_ObjectHideFlags: 0

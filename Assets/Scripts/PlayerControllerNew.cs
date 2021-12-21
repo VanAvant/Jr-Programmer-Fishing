@@ -20,6 +20,7 @@ public class PlayerControllerNew : NavAgentScript
     [SerializeField] GameObject navPointPrefab;
     private GameObject navPoint;
     //private int navPointLayer = 6;
+    private float samplePositionDistanceIsland = 0.5f;
     private float samplePositionDistance = 50f;
 
     private string islandName = "Island";
@@ -74,7 +75,14 @@ public class PlayerControllerNew : NavAgentScript
     {
         NavMeshHit discard;
 
-        if (NavMesh.SamplePosition(cursorRaycast.point, out discard, samplePositionDistance, islandMeshArea)) //Contained within if statement because navmesh is rough in places due to premade island asset and causes unpredicatable behaviour otherwise
+        float sampleDistance = samplePositionDistance;
+
+        if (cursorRaycast.collider.name == islandName)
+        {
+            sampleDistance = samplePositionDistanceIsland;
+        }
+
+        if (NavMesh.SamplePosition(cursorRaycast.point, out discard, sampleDistance, islandMeshArea)) //Contained within if statement because navmesh is rough in places due to premade island asset and causes unpredicatable behaviour otherwise
         {
             MoveToTarget(discard.position, navPoint);
 
@@ -104,17 +112,16 @@ public class PlayerControllerNew : NavAgentScript
 
     private void HandleClickOnSea(RaycastHit cursorRaycast)
     {
-        Debug.Log("Clicked on sea");
+        //Debug.Log("Clicked on sea");
 
         Vector3 playerToTarget = cursorRaycast.point - transform.position; //Can be abstracted later
         playerToTarget.y = 0;
 
         float distanceToCast = playerToTarget.magnitude;
-        //Debug.Log("Distance to point = " + distanceToCast + ", maxDist: " + maxCastDistanceFromTarget + ", minDist" + minCastDistanceFromTarget);
 
         if (distanceToCast > maxCastDistanceFromTarget)
         {
-            Debug.Log("Too far, move toward closest point");
+            //Debug.Log("Too far, move toward closest point");
 
             //Check if point on line between player and target, max distance from target, is on the navmesh, if so move there
             Vector3 moveTarget = cursorRaycast.point + (-playerToTarget.normalized * maxCastDistanceFromTarget);
@@ -152,13 +159,13 @@ public class PlayerControllerNew : NavAgentScript
 
             if (moveTargetToFishingTarget.magnitude <= maxCastDistanceFromTarget)
             {
-                Debug.Log("Set fishing target");
+                //Debug.Log("Set fishing target");
                 fishingTarget = cursorRaycast.point;
             }
             else
             {
                 //Calculate new fishing point;
-                Debug.Log("Need to get new fishing target");
+                //Debug.Log("Need to get new fishing target");
 
                 Vector3 newFishingTarget = navAgent.destination + (moveTargetToFishingTarget.normalized * maxCastDistanceFromTarget); //Get point max distance from move target along vector from move target to clicked point
                 fishingTarget = newFishingTarget;
@@ -167,7 +174,7 @@ public class PlayerControllerNew : NavAgentScript
 
         else if (distanceToCast < minCastDistanceFromTarget)
         {
-            Debug.Log("Too close, cast over point");
+            //Debug.Log("Too close, cast over point");
 
             Vector3 newTarget = transform.position + (playerToTarget.normalized * minCastDistanceFromTarget);
 
@@ -176,7 +183,7 @@ public class PlayerControllerNew : NavAgentScript
         }
         else
         {
-            Debug.Log("In range, casting");
+            //Debug.Log("In range, casting");
             fishingTarget = cursorRaycast.point;
             StartCoroutine(FishingRoutine(fishingTarget));
         }
@@ -188,7 +195,6 @@ public class PlayerControllerNew : NavAgentScript
 
         navAgent.ResetPath();
         Debug.Log("Casting");
-        MoveToTarget(transform.position, navPoint);
 
         Vector3 lookAtPoint = new Vector3(target.x, transform.position.y, target.z);
         transform.LookAt(lookAtPoint);

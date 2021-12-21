@@ -7,17 +7,21 @@ public class NavAgentScript : MonoBehaviour
 {
     protected NavMeshAgent navAgent;
 
-    //private void Start()
-    //{
-    //    navAgent = GetComponent<NavMeshAgent>();
-    //}
-
     public void MoveToTarget(Vector3 target, GameObject navPoint) //Uses NavMesh to move player to passed point
     {
-        navPoint.transform.position = target;
+        Vector3 targetPoint = GetRaycastAtPosition(target).point;
+
+        navPoint.transform.position = targetPoint;
 
         navAgent.ResetPath();
-        navAgent.SetDestination(GetRaycastAtPosition(target).point);
+        navAgent.SetDestination(targetPoint);
+
+
+        //Current code
+        //navPoint.transform.position = target;
+
+        //navAgent.ResetPath();
+        //navAgent.SetDestination(GetRaycastAtPosition(target).point);
         
     }
     public RaycastHit GetRaycastAtPosition(Vector3 point)

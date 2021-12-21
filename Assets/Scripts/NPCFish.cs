@@ -10,21 +10,29 @@ public class NPCFish : NavAgentScript
     private float spawnMinRadius;
     private float spawnMaxRadius;
 
-    //NPC movement/behaviour variables
+    //NPC movement behaviour variables
     [SerializeField] GameObject navPointPrefab;
-    private GameObject navPoint;
-
-    //[SerializeField] float targetMaxRadius;
-
-    private Vector3 nextTarget;
+    protected GameObject navPoint;
+    private int minWaitTime = 3;
+    private int maxWaitTime = 6;
     private bool movingToTarget;
-    private float swimSpeed;
 
-    private bool isIdle = true;
+    //Escape behaviour variables
+    private bool fishIsEscaping = false;
+    private float resetDistance = 100;
+    private Vector3 escapeTarget = Vector3.zero;
+
+
+    
+    static bool fishIsBiting = false;
+
+    //Swimming defaults
+    protected float defaultSwimSpeed;
+    protected float defaultAcceleration;
+    protected float defaultAngularSpeed;
 
     void Awake()
     {
-        swimSpeed = 8.0f; // Place into child once tested
         navAgent = GetComponent<NavMeshAgent>();
         navPoint = Instantiate(navPointPrefab, GetRandomPosition(), navPointPrefab.transform.rotation);
 
@@ -32,19 +40,88 @@ public class NPCFish : NavAgentScript
         spawnMinRadius = 65;
 
         transform.position = GetRandomPosition();
+        StartCoroutine(FishDefaultRoutine());
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        if (!movingToTarget)
+        defaultSwimSpeed = navAgent.speed;
+        defaultAcceleration = navAgent.acceleration;
+        defaultAngularSpeed = navAgent.angularSpeed;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.B))
         {
-            MoveToTarget(GetRandomPosition(), navPoint);
-            movingToTarget = true;
+            fishIsBiting = !fishIsBiting;
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            fishIsEscaping = !fishIsEscaping;
         }
     }
 
-    public Vector3 GetRandomPosition()
+    public virtual IEnumerator FishDefaultRoutine()
+    {
+        while (true) //Convert to gameRunning
+        {
+            if (fishIsEscaping)
+            {
+                //Debug.Log("Entering escape routine");
+                if (escapeTarget == Vector3.zero)
+                {
+                    EscapeFromTarget();
+                }
+            }
+            else if (fishIsBiting)
+            {
+                //Debug.Log("Entering biting routine");
+            }
+            else
+            {
+                if (!movingToTarget)
+                {
+                    movingToTarget = true;
+                    yield return new WaitForSeconds(Random.Range(minWaitTime, maxWaitTime));
+                    MoveToTarget(GetRandomPosition(), navPoint);
+                }
+            }
+            yield return null;
+        }
+    }
+
+    private void ResetFish() //Would like to have this reset fish position closer to island but off screen
+    {
+        navAgent.speed = defaultSwimSpeed;
+        navAgent.acceleration = defaultAcceleration;
+        navAgent.angularSpeed = defaultAngularSpeed;
+
+        escapeTarget = Vector3.zero;
+        fishIsEscaping = false;
+        //Debug.Log("Returning to normal behaviour");
+    }
+
+    private void EscapeFromTarget()
+    {
+        navAgent.speed *= 5;
+        navAgent.acceleration *= 5;
+        navAgent.angularSpeed *= 5;
+        Vector3 escapeDirection = transform.position.normalized;
+        escapeTarget = escapeDirection * resetDistance;
+        MoveToTarget(escapeTarget, navPoint);
+
+        //Debug.Log("Escaping to " + escapeTarget);
+
+        //Get vector from island to target
+        //Rotate by random increment of 10° between 50 and -50 
+        //    vector = Quaternion.AngleAxis(-45, Vector3.up) * vector;
+        // OR 
+        //    vector = Quaternion.Euler(0, -45, 0) * vector; 
+    }
+
+
+    public Vector3 GetRandomPosition(bool maxDistance = false)
     {
         Vector2 randomDirection = Random.insideUnitCircle.normalized;
 
@@ -58,14 +135,30 @@ public class NPCFish : NavAgentScript
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log("Called onTriggerEnter" + other.name);
-        //if (other.gameObject.CompareTag("NavPoint") && other.transform.parent.name == this.name)
         if (other.gameObject.CompareTag("NavPoint"))
         {
-            //Debug.Log("Touched navPoint");
-            //MoveToTarget(GetRandomPosition(), navPoint);
             movingToTarget = false;
-            Debug.Log(gameObject.name + "Touched navpoint");
+            //Debug.Log(gameObject.name + "Touched navpoint");
+
+            if (fishIsEscaping)
+            {
+                //Debug.Log("Escaped, resetting");
+                ResetFish();
+            }
+        }
+        else if (other.gameObject.CompareTag("Shark"))
+        {
+            //Debug.Log(gameObject.name + "detected shark");
+            fishIsEscaping = true;
+        }
+        else if (other.gameObject.CompareTag("Float"))
+        {
+            if (fishIsBiting == false)
+            {
+                fishIsBiting = true;
+                //Debug.Log("Float detected, biting");
+            }
+           
         }
     }
 }

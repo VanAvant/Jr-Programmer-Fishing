@@ -33,7 +33,8 @@ public class CameraController : MonoBehaviour
             }
 
             OrbitCamera();
-            transform.position = focalPoint.transform.position + cameraOffset;
+            
+            CentreCameraOnPlayer();
         }
     }
 
@@ -58,6 +59,8 @@ public class CameraController : MonoBehaviour
                 cameraOffset = cameraOffset.normalized * cameraMinDistance;
             }
         }
+
+        transform.position = focalPoint.transform.position + cameraOffset; //Camera zoom
     }
 
     public virtual void ZoomCamera(float multiplier)

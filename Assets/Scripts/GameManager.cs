@@ -12,10 +12,11 @@ public class GameManager : MonoBehaviour
     public bool gameIsRunning = false;
 
     [SerializeField] GameObject sharkPrefab;
+    protected GameObject shark;
     [SerializeField] List<GameObject> fishPrefabList;
-    private List<GameObject> fishList;
+    public List<GameObject> fishList;
 
-    private int qtyActiveFish = 15;
+    private int qtyActiveFish = 20;
 
 
     // Start is called before the first frame update
@@ -38,6 +39,8 @@ public class GameManager : MonoBehaviour
         titleCamera.enabled = false;
 
         SpawnInitialFish();
+        shark = Instantiate(sharkPrefab, sharkPrefab.GetComponent<NPCShark>().GetRandomPosition(), sharkPrefab.transform.rotation);
+
     }
 
     private void SpawnInitialFish()
@@ -74,7 +77,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private bool IsPointOnScreen(Vector3 point) //Not sure if this is working
+    public bool IsPointOnScreen(Vector3 point) //Not sure if this is working
     {
         Vector3 pointOnScreen = mainCamera.WorldToViewportPoint(point);
 
@@ -103,10 +106,3 @@ public class GameManager : MonoBehaviour
         }   
     }
 }
-
-
-//TO DO:
-//Manage qty of fish 
-//Including 1 shark that patrols & scatters fish in range
-
-//Spawning fish function (Get position, if in view of camera, mirror/rotate
