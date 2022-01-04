@@ -191,8 +191,6 @@ public class PlayerControllerNew : NavAgentScript
 
     IEnumerator FishingRoutine(Vector3 target)
     {
-        //GameObject fishingFloat = Instantiate(floatPrefab, target, transform.rotation); //For debugging only
-
         navAgent.ResetPath();
         Debug.Log("Casting");
 
@@ -202,24 +200,28 @@ public class PlayerControllerNew : NavAgentScript
         playerAnim.Play("Villager@Fishing01");
         playerAnim.SetBool("b_IsPlayerMoving", false);
 
-        //Test code for logic purposes below this point
-
         bool cancelFishing = false;
 
         GameObject floatObj = Instantiate(floatPrefab, fishingTarget, transform.rotation);
 
-        //Debug.Log("Launch angle: " + GetLaunchAngle(target));
+        bool hasReleasedButton = false; 
 
         while (!cancelFishing)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonUp(0))
+            {
+                hasReleasedButton = true;
+            }
+
+            if (Input.GetMouseButtonDown(0) && hasReleasedButton)
             {
                 cancelFishing = true;
-                //GameObject.Destroy(fishingFloat);
             }
             yield return null;
         }
+
         Debug.Log("Finished fishing");
+        GameObject.Destroy(floatObj);
         yield break;
     }
 

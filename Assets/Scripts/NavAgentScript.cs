@@ -15,13 +15,6 @@ public class NavAgentScript : MonoBehaviour
 
         navAgent.ResetPath();
         navAgent.SetDestination(targetPoint);
-
-
-        //Current code
-        //navPoint.transform.position = target;
-
-        //navAgent.ResetPath();
-        //navAgent.SetDestination(GetRaycastAtPosition(target).point);
         
     }
     public RaycastHit GetRaycastAtPosition(Vector3 point)

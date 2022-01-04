@@ -6,38 +6,63 @@ public class NPCShark : NPCFish
 {
     GameManager gameManager;
 
-    private bool isChasingFish;
+    //private bool isChasingFish;
     private bool hasChosenFish;
     private GameObject targetFish;
-    private List<GameObject> fishList;
+
+    private float positionUpdateFrequency = 0.4f;
+    private float persuitRange = 100;
+
+    [SerializeField] Material red;
 
     //Navmesh speeds
-
-    // Start is called before the first frame update
 
     private void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-        fishList = gameManager.fishList; //ERROR IS SOMEWHERE HERE
-
+        navPoint.GetComponent<MeshRenderer>().material = red;
 
     }
     public override IEnumerator FishDefaultRoutine()
     {
+        float timeSinceUpdate = 0;
         while (true)
         {
-            if (!hasChosenFish)
+            if (timeSinceUpdate < positionUpdateFrequency)
             {
-                targetFish = GetClosestFish();
+                timeSinceUpdate += Time.deltaTime;
             }
 
-            if (!isChasingFish)
+            else
             {
-                MoveToTarget(targetFish.transform.position, navPoint);
+                timeSinceUpdate = 0;
+
+                if (hasChosenFish && GetRangeToFish() < persuitRange)
+                {
+                    {
+                        MoveToTarget(targetFish.transform.position, navPoint);
+                    }
+                }
+
+                else
+                {
+                    targetFish = GetClosestFish();
+                    hasChosenFish = true;
+                }
             }
             yield return null;
         }
+
+        float GetRangeToFish()
+        {
+            return Vector3.Distance(transform.position, targetFish.transform.position);
+        }
+    }
+
+    public override void ResetFish()
+    {
+        hasChosenFish = false;
+        //isChasingFish = false;
     }
 
     private GameObject GetClosestFish() //For loop over list, calculate distance then choose closest;
@@ -45,14 +70,13 @@ public class NPCShark : NPCFish
         GameObject closestFish;
         float closestFishDistance;
 
-        Debug.Log("FishList 0: " + fishList[0].name); //List is not instantiating properly
-        SetClosestFish(fishList[0]);
+        SetClosestFish(gameManager.fishList[0]);
 
-        for (int i = 1; i > fishList.Count; i++)
+        for (int i = 1; i < gameManager.fishList.Count; i++)
         {
-            if (Vector3.Distance(transform.position, fishList[i].transform.position) < closestFishDistance)
+            if (Vector3.Distance(transform.position, gameManager.fishList[i].transform.position) < closestFishDistance)
             {
-                SetClosestFish(fishList[i]);
+                SetClosestFish(gameManager.fishList[i]);
             }
         }
 
@@ -64,7 +88,5 @@ public class NPCShark : NPCFish
             closestFishDistance = Vector3.Distance(transform.position, fish.transform.position);
         }
     }
-
-
 }
 

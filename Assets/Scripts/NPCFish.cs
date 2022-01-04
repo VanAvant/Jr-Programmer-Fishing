@@ -7,8 +7,8 @@ public class NPCFish : NavAgentScript
 {
 
     //NPC Spawning variables
-    private float spawnMinRadius;
-    private float spawnMaxRadius;
+    private float spawnMinRadius = 75;
+    private float spawnMaxRadius = 65;
 
     //NPC movement behaviour variables
     [SerializeField] GameObject navPointPrefab;
@@ -17,12 +17,12 @@ public class NPCFish : NavAgentScript
     private int maxWaitTime = 6;
     private bool movingToTarget;
 
+    private int behaviourDelay = 1;
+
     //Escape behaviour variables
     private bool fishIsEscaping = false;
     private float resetDistance = 100;
     private Vector3 escapeTarget = Vector3.zero;
-
-
     
     static bool fishIsBiting = false;
 
@@ -36,11 +36,11 @@ public class NPCFish : NavAgentScript
         navAgent = GetComponent<NavMeshAgent>();
         navPoint = Instantiate(navPointPrefab, GetRandomPosition(), navPointPrefab.transform.rotation);
 
-        spawnMaxRadius = 75;
-        spawnMinRadius = 65;
+        //spawnMaxRadius = 75;
+        //spawnMinRadius = 65;
 
         transform.position = GetRandomPosition();
-        StartCoroutine(FishDefaultRoutine());
+        StartCoroutine(DelayDefaultRoutine());
     }
 
     private void Start()
@@ -52,14 +52,21 @@ public class NPCFish : NavAgentScript
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            fishIsBiting = !fishIsBiting;
-        }
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            fishIsEscaping = !fishIsEscaping;
-        }
+        //if (Input.GetKeyDown(KeyCode.B))
+        //{
+        //    fishIsBiting = !fishIsBiting;
+        //}
+        //if (Input.GetKeyDown(KeyCode.E))
+        //{
+        //    fishIsEscaping = !fishIsEscaping;
+        //}
+    }
+
+    private IEnumerator DelayDefaultRoutine()
+    {
+        yield return new WaitForSeconds(behaviourDelay);
+        StartCoroutine(FishDefaultRoutine());
+
     }
 
     public virtual IEnumerator FishDefaultRoutine()
@@ -91,7 +98,7 @@ public class NPCFish : NavAgentScript
         }
     }
 
-    private void ResetFish() //Would like to have this reset fish position closer to island but off screen
+    public virtual void ResetFish() //Would like to have this reset fish position closer to island but off screen
     {
         navAgent.speed = defaultSwimSpeed;
         navAgent.acceleration = defaultAcceleration;
@@ -99,6 +106,11 @@ public class NPCFish : NavAgentScript
 
         escapeTarget = Vector3.zero;
         fishIsEscaping = false;
+
+        // 'teleport' to opposite side of island;
+        Vector3 newPos = new Vector3(-transform.position.x, transform.position.y, -transform.position.z);
+        transform.position = newPos;
+
         //Debug.Log("Returning to normal behaviour");
     }
 
@@ -110,14 +122,7 @@ public class NPCFish : NavAgentScript
         Vector3 escapeDirection = transform.position.normalized;
         escapeTarget = escapeDirection * resetDistance;
         MoveToTarget(escapeTarget, navPoint);
-
         //Debug.Log("Escaping to " + escapeTarget);
-
-        //Get vector from island to target
-        //Rotate by random increment of 10° between 50 and -50 
-        //    vector = Quaternion.AngleAxis(-45, Vector3.up) * vector;
-        // OR 
-        //    vector = Quaternion.Euler(0, -45, 0) * vector; 
     }
 
 

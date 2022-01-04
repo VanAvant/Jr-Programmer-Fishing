@@ -18,35 +18,29 @@ public class GameManager : MonoBehaviour
 
     private int qtyActiveFish = 20;
 
-
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        //mainCamera.transform.SetPositionAndRotation(titleCamera.transform.position, titleCamera.transform.rotation);
         fishList = new List<GameObject>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public void StartGame()
     {
-        gameIsRunning = true;
-        mainCamera.GetComponent<CameraController>().ZoomCamera(100);
-        titleCamera.enabled = false;
+        
+        if (!gameIsRunning)
+        {
+            Debug.Log("Game has started");
+            gameIsRunning = true;
+            mainCamera.GetComponent<CameraController>().ZoomCamera(100);
+            titleCamera.enabled = false;
 
-        SpawnInitialFish();
-        shark = Instantiate(sharkPrefab, sharkPrefab.GetComponent<NPCShark>().GetRandomPosition(), sharkPrefab.transform.rotation);
-
+            SpawnInitialFish();
+            shark = Instantiate(sharkPrefab, sharkPrefab.GetComponent<NPCShark>().GetRandomPosition(), sharkPrefab.transform.rotation);
+        }
     }
 
     private void SpawnInitialFish()
     {
         //Populate fishPrefab list with fish
-        //Spawn shark
 
         for (int i = 0; i < qtyActiveFish; i++)
         {

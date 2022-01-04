@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5644944907240738980}
   - component: {fileID: 5938760595768303871}
   - component: {fileID: 3448311174397409595}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: FishV3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 6422712825218995272}
   - component: {fileID: 9135261577138069634}
   - component: {fileID: 6779341111715044595}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: FishV3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

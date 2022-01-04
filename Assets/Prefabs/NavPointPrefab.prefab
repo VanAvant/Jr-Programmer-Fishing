@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 8849554152122659530}
   - component: {fileID: 7276621649530072150}
   - component: {fileID: 5771883435993245919}
-  m_Layer: 6
-  m_Name: NavPoint
+  m_Layer: 2
+  m_Name: NavPointPrefab
   m_TagString: NavPoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

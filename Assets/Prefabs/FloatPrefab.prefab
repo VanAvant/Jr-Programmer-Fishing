@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 8383179230003730875}
   - component: {fileID: 8383179230003730879}
   - component: {fileID: 8855346166623336347}
-  m_Layer: 0
-  m_Name: Float
+  - component: {fileID: -8268404951478639208}
+  m_Layer: 2
+  m_Name: FloatPrefab
   m_TagString: Float
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -127,3 +128,15 @@ CapsuleCollider:
   m_Height: 11.511049
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-8268404951478639208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8383179230003730756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 692f11ceaa2c0ed40ab4f05553d63905, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
