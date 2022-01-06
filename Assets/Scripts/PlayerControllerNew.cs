@@ -192,7 +192,7 @@ public class PlayerControllerNew : NavAgentScript
     IEnumerator FishingRoutine(Vector3 target)
     {
         navAgent.ResetPath();
-        Debug.Log("Casting");
+        //Debug.Log("Casting");
 
         Vector3 lookAtPoint = new Vector3(target.x, transform.position.y, target.z);
         transform.LookAt(lookAtPoint);
@@ -220,38 +220,12 @@ public class PlayerControllerNew : NavAgentScript
             yield return null;
         }
 
-        Debug.Log("Finished fishing");
-        GameObject.Destroy(floatObj);
+        //Debug.Log("Finished fishing");
+
+        //GameObject.Destroy(floatObj);
+        //floatObj.GetComponent<FishingFloat>().DeleteSelf();
+
         yield break;
-    }
-
-    private float GetLaunchAngle(Vector3 target)
-    {
-        //Vector3 targetVectorFlat = new Vector3(target.x,0, target.z) - new Vector3(transform.position.x, 0,transform.position.z);
-
-        //float targetDistance = targetVectorFlat.magnitude;
-
-        ////Formula for angle == A = 0.5 arcsin(gx / V^2)
-
-        //float launchAngle = 0.5f * Mathf.Asin((Physics.gravity.magnitude * targetDistance) / (castSpeed * castSpeed)); //Angle from XZ plane 
-
-        //Vector3 launchVector = targetVectorFlat.normalized * castSpeed;
-
-        ////Get perpendicular vector to launchVector
-
-        //Vector3 rotationAxis =  Vector3.Cross(launchVector, Vector3.up).normalized;
-
-        //return launchAngle;
-
-        Vector3 targetVectorFlat = new Vector3(target.x, 0, target.z) - new Vector3(transform.position.x, 0, transform.position.z);
-
-        float targetDistance = targetVectorFlat.magnitude;
-
-        ////Formula for angle == A = 0.5 arcsin(gx / V^2)
-        float launchAngle = 0.5f * Mathf.Asin((Physics.gravity.magnitude * targetDistance) / (castSpeed * castSpeed));
-
-        return launchAngle;
-
     }
 
     private void OnTriggerEnter(Collider other) //detect nav points (for animation)

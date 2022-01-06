@@ -28,13 +28,13 @@ public class GameManager : MonoBehaviour
         
         if (!gameIsRunning)
         {
-            Debug.Log("Game has started");
+            //Debug.Log("Game has started");
             gameIsRunning = true;
             mainCamera.GetComponent<CameraController>().ZoomCamera(100);
             titleCamera.enabled = false;
 
             SpawnInitialFish();
-            shark = Instantiate(sharkPrefab, sharkPrefab.GetComponent<NPCShark>().GetRandomPosition(), sharkPrefab.transform.rotation);
+            //shark = Instantiate(sharkPrefab, sharkPrefab.GetComponent<NPCShark>().GetRandomPosition(), sharkPrefab.transform.rotation);
         }
     }
 
@@ -44,31 +44,33 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < qtyActiveFish; i++)
         {
-            //Get spawn position
-            //If spawn position is on camera, mirror X and Z 
-
-            int nextFishType = Random.Range(0, fishPrefabList.Count);
-
-            //Debug.Log("Next fish type: " + nextFishType);
-
-            GameObject newFish = Instantiate(fishPrefabList[nextFishType], fishPrefabList[nextFishType].transform.position, fishPrefabList[nextFishType].transform.rotation); //Rotation doesn't matter as it is controlled by navmeshagent;
-
-            if (IsPointOnScreen(newFish.transform.position))
-            {
-                //Debug.Log("Mirroring position " + newFish.transform);
-
-                Vector3 newPos = newFish.transform.position;
-
-                newPos.x = -newPos.x;
-                newPos.y = -newPos.y;
-
-                newFish.transform.position = newPos;
-
-                //Debug.Log("New position " + newFish.transform);
-            }
+            GameObject newFish = SpawnNewFish();
 
             fishList.Add(newFish);
         }
+    }
+
+    public GameObject SpawnNewFish()
+    {
+        int nextFishType = Random.Range(0, fishPrefabList.Count);
+
+        GameObject newFish = Instantiate(fishPrefabList[nextFishType], fishPrefabList[nextFishType].transform.position, fishPrefabList[nextFishType].transform.rotation); //Rotation doesn't matter as it is controlled by navmeshagent;
+
+        if (IsPointOnScreen(newFish.transform.position))
+        {
+            //Debug.Log("Mirroring position " + newFish.transform);
+
+            Vector3 newPos = newFish.transform.position;
+
+            newPos.x = -newPos.x;
+            newPos.y = -newPos.y;
+
+            newFish.transform.position = newPos;
+
+            //Debug.Log("New position " + newFish.transform);
+            
+        }
+        return newFish;
     }
 
     public bool IsPointOnScreen(Vector3 point) //Not sure if this is working

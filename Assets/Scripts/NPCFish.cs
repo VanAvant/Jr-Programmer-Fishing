@@ -31,6 +31,11 @@ public class NPCFish : NavAgentScript
     protected float defaultAcceleration;
     protected float defaultAngularSpeed;
 
+    //fishing variables
+    //private int nibblesMax = 5;
+    //private int nibblesMin = 3;
+    //private int remainingNibbles;
+
     void Awake()
     {
         navAgent = GetComponent<NavMeshAgent>();
@@ -66,7 +71,6 @@ public class NPCFish : NavAgentScript
     {
         yield return new WaitForSeconds(behaviourDelay);
         StartCoroutine(FishDefaultRoutine());
-
     }
 
     public virtual IEnumerator FishDefaultRoutine()
@@ -114,7 +118,7 @@ public class NPCFish : NavAgentScript
         //Debug.Log("Returning to normal behaviour");
     }
 
-    private void EscapeFromTarget()
+    public void EscapeFromTarget()
     {
         navAgent.speed *= 5;
         navAgent.acceleration *= 5;
@@ -138,6 +142,26 @@ public class NPCFish : NavAgentScript
         return newPosition;
     }
 
+    private void FishHasTakenBait(GameObject fishingFloat)
+    {
+        fishIsBiting = true;
+        //remainingNibbles = Random.Range(nibblesMin, nibblesMax);
+
+        navAgent.ResetPath();
+        
+        navAgent.acceleration *= 0.5f;
+        navAgent.speed *= 0.5f;
+        MoveToTarget(fishingFloat.transform.position, navPoint);
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Float"))
+        {
+            //Run canCatch from fishing float
+            collision.gameObject.GetComponent<FishingFloat>().FishHasBitten();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("NavPoint"))
@@ -158,10 +182,13 @@ public class NPCFish : NavAgentScript
         }
         else if (other.gameObject.CompareTag("Float"))
         {
-            if (fishIsBiting == false)
+            if (other.gameObject.GetComponent<FishingFloat>().bitingFish == null)
             {
-                fishIsBiting = true;
-                //Debug.Log("Float detected, biting");
+                other.gameObject.GetComponent<FishingFloat>().bitingFish = gameObject;
+                
+                Debug.Log("Float detected, biting");
+
+                FishHasTakenBait(other.gameObject);
             }
            
         }
